@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 TRUNCATE  
+=======
+TRUNCATE  
+>>>>>>> ce7bde083186c37ac612a0f0c9218c3e0f6fe889
