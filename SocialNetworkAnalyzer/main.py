@@ -1,6 +1,7 @@
 import os
 import openpyxl
 from openpyxl.styles import PatternFill
+from openpyxl.worksheet.worksheet import Worksheet
 
 import config as cf
 import utils
@@ -11,7 +12,7 @@ import tg
 
 def fill_cells(sheet, stat, indexes):
     """
-    fills Excel cells with special colours. Red - for min-values, green - for min-values
+    fills Excel cells with special colours. Red - for min-values, green - for max-values
     :param sheet: sheet of Excel file
     :param stat: stat-table retrieved from network APIs
     :param indexes: list of column numbers
@@ -22,7 +23,11 @@ def fill_cells(sheet, stat, indexes):
     for i in indexes:
         ext_dict[i] = (max(ext_list[i - 1]), min(ext_list[i - 1]))
 
-    i = 1
+    i = sheet.max_row + 1
+    for j in range(len(ext_list)):
+        cell = sheet.cell(i, j + 1)
+        cell.fill = PatternFill('solid', fgColor="808080")
+
     for rec_ in stat:
         i += 1
         sheet.append(rec_)
@@ -36,12 +41,6 @@ def fill_cells(sheet, stat, indexes):
                 cell.fill = PatternFill('solid', fgColor="FF0000")
 
 
-if os.path.isfile('Analytics.xlsx'):
-    wb = openpyxl.load_workbook('Analytics.xlsx')
-else:
-    wb = openpyxl.Workbook()
-
-
 def edit_sheet(sheet_name, column_names):
     if sheet_name in wb.sheetnames:
         sheet = wb[sheet_name]
@@ -52,24 +51,36 @@ def edit_sheet(sheet_name, column_names):
     return sheet
 
 
-ok_analyser = ok.OKAnalyser()
-vk_analyser = vk.VKAnalyser()
-tg_analyser = tg.TGAnalyser()
-
-
 def download_all_stats():
-    ok_sheet = edit_sheet(cf.OK_SHEET_NAME, cf.OK_COLUMNS)
+    if is_new:
+        ok_sheet = edit_sheet(cf.OK_SHEET_NAME, cf.OK_COLUMNS)
+        vk_sheet = edit_sheet(cf.VK_SHEET_NAME, cf.VK_COLUMNS)
+        tg_sheet = edit_sheet(cf.TG_SHEET_NAME, cf.TG_COLUMNS)
+    else:
+        ok_sheet = wb[cf.OK_SHEET_NAME]
+        vk_sheet = wb[cf.VK_SHEET_NAME]
+        tg_sheet = wb[cf.TG_SHEET_NAME]
+
     ok_stat = ok_analyser.get_stat_by_last_week()
     fill_cells(ok_sheet, ok_stat, [4, 5, 6, 7])
 
-    vk_sheet = edit_sheet(cf.VK_SHEET_NAME, cf.VK_COLUMNS)
     vk_stat = vk_analyser.get_stat_by_last_week()
     fill_cells(vk_sheet, vk_stat, [4, 5, 6, 7, 8, 9])
 
-    tg_sheet = edit_sheet(cf.TG_SHEET_NAME, cf.TG_COLUMNS)
     tg_stat = tg_analyser.get_stat_by_last_week()
     fill_cells(tg_sheet, tg_stat, [4, 5, 6, 7, 8, 9, 10])
 
+
+if os.path.isfile('Analytics.xlsx'):
+    wb = openpyxl.load_workbook('Analytics.xlsx')
+    is_new = False
+else:
+    wb = openpyxl.Workbook()
+    is_new = True
+
+ok_analyser = ok.OKAnalyser()
+vk_analyser = vk.VKAnalyser()
+tg_analyser = tg.TGAnalyser()
 
 env = utils.show_menu_and_get_choice()
 choice = env[1]
