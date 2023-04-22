@@ -1,0 +1,52 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+   <h1>All the news ({{news|length}})</h1>
+   <hr>
+
+    {% if news %}
+        <style>
+          p {
+            color: red;
+          }
+          .paragraph1 {
+            font-size: 18px;
+          }
+          .paragraph2 {
+            font-size: 13px;
+            color: #9fa0a4
+          }
+          A {
+            text-decoration: none;
+            color: black
+          }
+        </style>
+       <table  align="center">
+           <tr bgcolor="9F9F9F">
+               <td>Caption</td>
+               <td>Posted at</td>
+               <td>Preview</td>
+           </tr>
+
+           {% for new in news %}
+           <tr>
+               <td width = "40%" align="justify">{{ new.caption }}</td>
+               <td width = "20%" class="paragraph2">&nbsp;&nbsp;{{ new.posted_at|date:'d M Y' }}</td>
+               <td align="justify">
+                   <a href="/news/{{new.id}}">&nbsp;&nbsp;{{ new.text|truncatewords:20 }}</a>
+               </td>
+           </tr>
+           <tr bgcolor="9F9F9F">
+               <td></td><td></td><td></td>
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>There are no news and articles!</h2>
+   {% endif %}
+{% endblock content %}
