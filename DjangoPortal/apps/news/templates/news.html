@@ -1,11 +1,25 @@
 {% extends 'flatpages/default.html' %}
-
+{% load custom_tags %}
+{% load static %}
 {% block title %}
 News
 {% endblock title %}
 
 {% block content %}
    <h1>All the news ({{news|length}})</h1>
+       <p>
+           <img src="../static/media/create.jpg" >
+           <a href="/news/create">Create new</a> |
+           <a href="/articles/create">Create article</a>
+       </p>
+   {# Add form with fields to handle (applying filter) #}
+   <form action="" method="get">
+       {# context variable #}
+       {{ filter_set.form.as_p }}
+       {# Add submit button #}
+       <input type="submit" value="Find" />
+   </form>
+
    <hr>
 
     {% if news %}
@@ -39,6 +53,21 @@ News
                <td align="justify">
                    <a href="/news/{{new.id}}">&nbsp;&nbsp;{{ new.text|truncatewords:20 }}</a>
                </td>
+               {% if new.post_type == "NE" %}
+                   <td align="justify">
+                       <a href="/news/{{new.id}}/update"> <img src="../static/media/update.jpg" > </a>
+                   </td>
+                   <td align="justify">
+                       <a href="/news/{{new.id}}/delete"> <img src="../static/media/delete.jpg" > </a>
+                   </td>
+               {% elif new.post_type == "AR" %}
+                    <td align="justify">
+                       <a href="/articles/{{new.id}}/update"> <img src="../static/media/update.jpg" > </a>
+                   </td>
+                   <td align="justify">
+                       <a href="/articles/{{new.id}}/delete"> <img src="../static/media/delete.jpg" > </a>
+                   </td>
+               {% endif %}
            </tr>
            <tr bgcolor="9F9F9F">
                <td></td><td></td><td></td>
@@ -49,4 +78,28 @@ News
    {% else %}
        <h2>There are no news and articles!</h2>
    {% endif %}
+
+{# Add pagination to the page #}
+
+   {# Previous pages info #}
+   {% if page_obj.has_previous %}
+       <a href="?{% url_replace page=1 %}">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {# Current page info #}
+   {{ page_obj.number }}
+
+   {# Following pages info #}
+   {% if page_obj.has_next %}
+       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
 {% endblock content %}

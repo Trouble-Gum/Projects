@@ -1,7 +1,7 @@
 from random import *
 from django.db.models.query import QuerySet
 
-from news.models import *
+from apps.news.models import *
 
 u1 = User.objects.create_user(username='username1')
 u2 = User.objects.create_user(username='username2')
@@ -110,5 +110,11 @@ comments = list(comments)
 list(map(print, [f'comment: {rec["text"]} \n    commented_at: {rec["commented_at"].strftime("%d.%m.%Y %H:%M:%S")} \n'
                  f'    username: {rec["user__username"]} \n    rating: {rec["rating"]} \n'
                  for rec in comments]))
+
+# D7.7 Final module project
+
+user = User.objects.create_user("TechReviewer", "", "x")
+user.save()
+
 
 exit()

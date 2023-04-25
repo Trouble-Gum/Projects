@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.manager import Manager
 from django.core.exceptions import *
+from django.urls import reverse
 
 
 # Create your models here.
@@ -136,6 +137,9 @@ class Post(models.Model):
     @property
     def author_name(self):
         return self.author.get_username()
+
+    def get_absolute_url(self):
+        return reverse('new_detail', args=[str(self.pk)])
 
 
 class PostCategory(models.Model):
