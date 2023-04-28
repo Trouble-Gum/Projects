@@ -41,7 +41,16 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'project',
     'apps.news',
-    'django_filters'
+    'django_filters',
+
+    'apps.sign',
+    'apps.protect',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # ... include the providers you want to enable:
+    'allauth.socialaccount.providers.google',
 ]
 
 SITE_ID = 1
@@ -133,3 +142,23 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = BASE_DIR.parent / "media"
 MEDIA_URL = "media/"
+
+LOGIN_URL = '/accounts/login/'  # 'sign/login/'
+LOGIN_REDIRECT_URL = '../../protect/'
+# LOGOUT_REDIRECT_URL = 'sign/logout/'
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+ACCOUNT_FORMS = {'signup': 'apps.sign.forms.BasicSignupForm'}

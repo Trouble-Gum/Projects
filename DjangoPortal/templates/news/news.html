@@ -8,7 +8,7 @@ News
 {% block content %}
    <h1>All the news ({{news|length}})</h1>
        <p>
-           <img src="../static/media/create.jpg" >
+           <img src="../static/media/create.jpg" width="20">
            <a href="/news/create">Create new</a> |
            <a href="/articles/create">Create article</a>
        </p>
@@ -55,17 +55,17 @@ News
                </td>
                {% if new.post_type == "NE" %}
                    <td align="justify">
-                       <a href="/news/{{new.id}}/update"> <img src="../static/media/update.jpg" > </a>
+                       <a href="/news/{{new.id}}/update"> <img src="../static/media/update.jpg" width="20"> </a>
                    </td>
                    <td align="justify">
-                       <a href="/news/{{new.id}}/delete"> <img src="../static/media/delete.jpg" > </a>
+                       <a href="/news/{{new.id}}/delete"> <img src="../static/media/delete.jpg" width="20"> </a>
                    </td>
                {% elif new.post_type == "AR" %}
                     <td align="justify">
-                       <a href="/articles/{{new.id}}/update"> <img src="../static/media/update.jpg" > </a>
+                       <a href="/articles/{{new.id}}/update"> <img src="../static/media/update.jpg" width="20"> </a>
                    </td>
                    <td align="justify">
-                       <a href="/articles/{{new.id}}/delete"> <img src="../static/media/delete.jpg" > </a>
+                       <a href="/articles/{{new.id}}/delete"> <img src="../static/media/delete.jpg" width="20"> </a>
                    </td>
                {% endif %}
            </tr>

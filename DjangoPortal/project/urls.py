@@ -23,6 +23,11 @@ from apps.news import views as news_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('pages/', include('django.contrib.flatpages.urls')),
+
+    path('protect/', include('apps.protect.urls')),
+    path('sign/', include('apps.sign.urls')),
+    path('accounts/', include('allauth.urls')),
+
     path('counterparties/', views.CounterpartiesTable.as_view()),
     path('news/', news_views.NewsList.as_view(), name='news_list'),
     path('news/<int:pk>', news_views.NewsDetail.as_view(), name='new_detail'),
