@@ -1,9 +1,17 @@
+import sys
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import redirect, render
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.utils import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
-from apps.news.models import Post, article, new
+from apps.news.models import Post, article, new, CategorySubscribers, Category
 from apps.news.filters import PostFilter
 from apps.news.forms import NewForm, NewArticle
 
@@ -17,6 +25,7 @@ class NewsList(ListView):
 
     def __init__(self):
         super().__init__()
+        self.category_filter_values = None
         self.filter_set = None
 
     def get_queryset(self):
@@ -27,7 +36,46 @@ class NewsList(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter_set'] = self.filter_set
+        context['category_filter_values'] = self.category_filter_values
         return context
+
+    def get(self, request: WSGIRequest, *args, **kwargs):
+        req = dict(request.GET)
+        try:
+            self.category_filter_values = req['category']
+        except KeyError as e:
+            self.category_filter_values = None
+            # print(f'No category passed {e}')  # will be replaced with logging later
+
+        try:
+            subscribe = req['subscribe'][0]
+
+            if subscribe == 'subscribe':
+
+                for rec in req['category']:
+                    try:
+                        cs = CategorySubscribers(subscriber=request.__getattribute__('user'),
+                                                 category=Category.objects.get(category_name=rec)
+                                                 )
+                        cs.save()
+                    except (IntegrityError, ObjectDoesNotExist):  # cases of user are still subscribed on category
+                        # or chose "None"
+                        pass
+        except KeyError as e:
+            pass
+
+        return super().get(self, request, *args, **kwargs)
+
+    # def post(self, request: WSGIRequest, *args, **kwargs):
+    #     post = dict(request.POST)
+    #     # context = super().get_context_data(**kwargs)
+    #     if post['subscribe'] == ['subscribe']:
+    #         print('RQ - ' + str(request.GET))
+    #         # for rec in self.category_filter_values:
+    #         #     print(rec)
+    #         # cs = CategorySubscribers(subscriber=request.user, category=Category.objects.get(category_name='Cars'))
+    #         # cs.save()
+    #     return redirect('/')
 
 
 class NewsDetail(DetailView):
@@ -54,9 +102,38 @@ class NewCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     permission_required = ('news.add_post',)
 
     def form_valid(self, form):
+        # print(form)
         post = form.save(commit=False)
         post.post_type = new
         return super().form_valid(form)
+
+    # Code which contains emailing is moved from this post-method to signals.py (as event handler)
+
+    # def post(self, request, *args, **kwargs):
+    #     post = dict(request.POST)
+    #     categories = post['categories']
+    #     subscribers = CategorySubscribers.objects.filter(category_id__in=categories)
+    #     subscribers = subscribers.values('subscriber__email', 'subscriber__username').distinct()
+    #
+    #     mod = sys.modules['project.settings']
+    #
+    #     for rec in subscribers:
+    #         html_content = render_to_string(
+    #             'news/post_created.html',
+    #             {
+    #                 'text': post['text'][0],
+    #                 'username': rec["subscriber__username"]
+    #             }
+    #         )
+    #         msg = EmailMultiAlternatives(
+    #             subject=post['caption'][0],
+    #             body=post['text'][0],
+    #             from_email=f'{getattr(mod, "EMAIL_HOST_USER")}{getattr(mod, "EMAIL_POSTFIX")}',
+    #             to=[rec['subscriber__email']]
+    #         )
+    #         msg.attach_alternative(html_content, "text/html")
+    #         msg.send()
+    #     return super().post(self, request, *args, **kwargs)  # redirect('/')
 
 
 class NewUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):

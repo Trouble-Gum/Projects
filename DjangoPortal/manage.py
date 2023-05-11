@@ -3,6 +3,14 @@
 import os
 import sys
 
+import dotenv
+
+import project.settings
+from dotenv import load_dotenv
+
+env = os.environ.get
+DOTENV_PATH = '.env/config.env'
+
 
 def main():
     """Run administrative tasks."""
@@ -19,4 +27,17 @@ def main():
 
 
 if __name__ == '__main__':
+
+    if os.path.exists(DOTENV_PATH):
+        load_dotenv(DOTENV_PATH, override=True)
+    conf = dict(dotenv.dotenv_values(DOTENV_PATH))
+    mod = sys.modules['project.settings']
+    list(map(lambda x: setattr(mod,
+                               x[0],
+                               int(x[1]) if x[1].isdigit()
+                               else True if x[1] == 'True'
+                               else False if x[1] == 'False'
+                               else x[1]
+                               ),
+             conf.items()))
     main()

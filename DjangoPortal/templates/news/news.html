@@ -13,12 +13,84 @@ News
            <a href="/articles/create">Create article</a>
        </p>
    {# Add form with fields to handle (applying filter) #}
-   <form action="" method="get">
+   <form action="" method="get" id="filterForm">
        {# context variable #}
-       {{ filter_set.form.as_p }}
-       {# Add submit button #}
-       <input type="submit" value="Find" />
+       <table align="center">
+           <tr>
+               <td>
+                   <p> {{ filter_set.form.date_range.label }} </p>
+               </td>
+               <td>
+                   <p> {{ filter_set.form.date_range }} </p>
+               </td>
+           </tr>
+           <tr>
+               <td>
+                   <p> {{ filter_set.form.author_name.label }} </p>
+                   <p> {{ filter_set.form.caption.label }} </p>
+               </td>
+               <td>
+                   <table align="right">
+                       <tr>
+                           <td>
+                               <p> {{filter_set.form.author_name}} </p>
+                               <p> {{filter_set.form.caption}} </p>
+                           </td>
+                           <td></td><td></td>
+                           <td>
+                               <p> {{filter_set.form.category.label}} {{filter_set.form.category}} </p>
+                           </td>
+                       </tr>
+                   </table>
+
+               </td>
+           </tr>
+       </table>
+       <p>
+           {# Add submit button #}
+           <input type="submit" value="Find" />
+           {% if category_filter_values %}
+               <button value="subscribe" name="subscribe"
+                       id = "subscribe" title="subscribe on selected categories">subscribe
+               </button>
+           {% endif %}
+       </p>
    </form>
+
+<script type="text/javascript">
+    let filterForm = document.getElementById("filterForm");
+
+    document.getElementById('subscribe').onclick = function() {
+        //let currentURL = new URL(window.location.href);
+        //currentURL.searchParams.append('subscribe', 'subscribe');
+        //currentURL.searchParams.delete('category');
+        var selected = [];
+        for (var option of document.getElementById('id_category').options)
+        {
+            if (option.selected) {
+                selected.push(option.value);
+                //currentURL.searchParams.append('category', option.value);
+            }
+        }
+
+        res = confirm("The following categories will be subscribed: " + selected);
+        if (res) {
+            //alert(currentURL)
+            //window.location.href = currentURL;
+            filterForm.submit();
+        }
+        else {
+            return false
+        }
+    }
+/*
+    filterForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+         perform operation with form input
+        filterForm.submit();
+    });
+*/
+</script>
 
    <hr>
 

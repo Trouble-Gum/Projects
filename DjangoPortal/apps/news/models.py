@@ -11,7 +11,7 @@ class Author(models.Model):
     """Django model which implements Author entity"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     rating = models.FloatField(default=0)
-
+    name: str
     objects = Manager()
 
     def update_rating(self):
@@ -89,11 +89,20 @@ class Author(models.Model):
         result = result[0]['user__username']
         return result
 
+    def __str__(self):
+        user_: User = User.objects.get(pk=self.__getattribute__('user_id'))
+        result = f'{user_.last_name} {user_.first_name}'
+        return result if result.strip() else self.get_username()
+
 
 class Category(models.Model):
     """Django model which implements Category entity"""
     objects = Manager()
     category_name = models.CharField(max_length=20, unique=True)
+    subscribers = models.ManyToManyField(User, through='CategorySubscribers')
+
+    def __str__(self):
+        return self.category_name
 
 
 article = 'AR'
@@ -146,7 +155,15 @@ class PostCategory(models.Model):
     """Django model which implements many-to-many relationship between entities (Post&Category)"""
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    objects = Manager()
 
+
+class CategorySubscribers(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    subscriber = models.ForeignKey(User, on_delete=models.CASCADE)
+    models.UniqueConstraint(fields=['category_id', 'subscriber_id'], name='UK_CategorySubscribers', )
+
+    objects = Manager()
 
 class Comment(models.Model):
     """Django model which implements Comment entity"""
