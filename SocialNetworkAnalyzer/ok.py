@@ -88,9 +88,12 @@ class OKAnalyser:
 
             tpc_id = stat_rec[ID]
             text = self._ok_inst.mediatopic.getByIds(topic_ids=tpc_id, fields='media_topic.*')
-            text = str(text.json()['media_topics'][0]['media'][0]['text']
-                       [:50].encode('cp1251', 'ignore').decode('cp1251')
-                       )
+            try:
+                text = str(text.json()['media_topics'][0]['media'][0]['text']
+                           [:50].encode('cp1251', 'ignore').decode('cp1251')
+                           )
+            except KeyError:
+                text = ''
             text = utils.smart_cut(text)
 
             ok_list.append([

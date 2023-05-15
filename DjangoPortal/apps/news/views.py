@@ -14,7 +14,7 @@ from django.template.loader import render_to_string
 from apps.news.models import Post, article, new, CategorySubscribers, Category
 from apps.news.filters import PostFilter
 from apps.news.forms import NewForm, NewArticle
-
+from .tasks import complete_order
 
 class NewsList(ListView):
     model = Post
@@ -105,6 +105,7 @@ class NewCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         # print(form)
         post = form.save(commit=False)
         post.post_type = new
+        complete_order.apply_async([post.pk], countdown=10)
         return super().form_valid(form)
 
     # Code which contains emailing is moved from this post-method to signals.py (as event handler)

@@ -182,3 +182,10 @@ ACCOUNT_FORMS = {'signup': 'apps.sign.forms.BasicSignupForm'}
 
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
+CELERY_BROKER_URL = f'redis://:{env("REDIS_PASSWORD")}@{env("REDIS_END_POINT_ACC")}:{env("REDIS_END_POINT_PORT")}'
+CELERY_RESULT_BACKEND = f'redis://:{env("REDIS_PASSWORD")}@{env("REDIS_END_POINT_ACC")}:{env("REDIS_END_POINT_PORT")}'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
