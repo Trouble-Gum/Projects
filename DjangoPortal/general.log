@@ -1,0 +1,4 @@
+2023-09-16 20:02:56,810 INFO autoreload Watching for file changes with StatReloader 
+2023-09-16 20:04:11,881 INFO autoreload C:\Projects\DjangoPortal\project\settings.py changed, reloading. 
+2023-09-16 20:22:27,097 INFO autoreload Watching for file changes with StatReloader 
+2023-09-16 20:22:49,664 INFO autoreload C:\Projects\DjangoPortal\project\settings.py changed, reloading. 

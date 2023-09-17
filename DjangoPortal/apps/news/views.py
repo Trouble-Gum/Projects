@@ -1,4 +1,5 @@
-import sys
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -15,6 +16,7 @@ from apps.news.models import Post, article, new, CategorySubscribers, Category
 from apps.news.filters import PostFilter
 from apps.news.forms import NewForm, NewArticle
 from .tasks import complete_order
+
 
 class NewsList(ListView):
     model = Post
@@ -83,6 +85,14 @@ class NewsDetail(DetailView):
     template_name = 'news/new.html'
     context_object_name = 'new'
 
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+
+        return obj
+
 
 def get_context_data_(self, **kwargs):
     context = None
@@ -108,33 +118,6 @@ class NewCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         complete_order.apply_async([post.pk], countdown=10)
         return super().form_valid(form)
 
-    # Code which contains emailing is moved from this post-method to signals.py (as event handler)
-
-    # def post(self, request, *args, **kwargs):
-    #     post = dict(request.POST)
-    #     categories = post['categories']
-    #     subscribers = CategorySubscribers.objects.filter(category_id__in=categories)
-    #     subscribers = subscribers.values('subscriber__email', 'subscriber__username').distinct()
-    #
-    #     mod = sys.modules['project.settings']
-    #
-    #     for rec in subscribers:
-    #         html_content = render_to_string(
-    #             'news/post_created.html',
-    #             {
-    #                 'text': post['text'][0],
-    #                 'username': rec["subscriber__username"]
-    #             }
-    #         )
-    #         msg = EmailMultiAlternatives(
-    #             subject=post['caption'][0],
-    #             body=post['text'][0],
-    #             from_email=f'{getattr(mod, "EMAIL_HOST_USER")}{getattr(mod, "EMAIL_POSTFIX")}',
-    #             to=[rec['subscriber__email']]
-    #         )
-    #         msg.attach_alternative(html_content, "text/html")
-    #         msg.send()
-    #     return super().post(self, request, *args, **kwargs)  # redirect('/')
 
 
 class NewUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
@@ -155,6 +138,7 @@ class NewDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     get_context_data = get_context_data_
 
     permission_required = ('news.delete_post',)
+
 
 
 class ArticleCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):

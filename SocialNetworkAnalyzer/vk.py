@@ -3,6 +3,7 @@ import requests
 import datetime
 
 import config as cf
+from time import sleep
 
 
 class VKAnalyser:
@@ -63,6 +64,7 @@ class VKAnalyser:
         vk_list = []
 
         for rec in posts:
+            sleep(0.1)
             post_id = rec["id"]
 
             posts_filter = f'{self._vk_club_id}_{post_id}'

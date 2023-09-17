@@ -1,0 +1,57 @@
+Top rated author: 
+  FilmReviewer
+  rating: 8.0
+
+Top rated post:
+  17.04.2023 12:34:25
+  rating: 2.0
+  author: FilmReviewer
+  preview: There could be the place for your advertisement
+
+comment: comment by username1
+    commented_at: 17.04.2023 12:34:26
+    username: username1
+    rating: 0.0
+
+comment: comment by username2
+    commented_at: 17.04.2023 12:34:26
+    username: username2
+    rating: 2.0
+
+comment: comment by MusicReviewer
+    commented_at: 17.04.2023 12:34:26
+    username: MusicReviewer
+    rating: -2.0
+
+comment: comment by FilmReviewer
+    commented_at: 17.04.2023 12:34:26
+    username: FilmReviewer
+    rating: 0.0
+
+# with q as --Checking control sums
+# (
+#   SELECT a.rating,
+# 		 u.id,
+# 		 u.username,
+# 		 case 
+# 		 when row_number() over(partition by u.id, p.id)  = 1 
+# 		 then p.rating * 3
+# 		 else null
+# 		 end as post_rating,
+# 		 CASE when p.id = c.post_id then c.rating else 0 END as post_comments_rating
+# 	FROM news_post p 
+# 		 INNER JOIN news_author a on p.author_id =  a.id 
+# 		 INNER JOIN auth_user u on u.id = a.user_id  
+# 		 INNER JOIN news_comment c on p.id = c.post_id
+# )
+# SELECT username, rating as python_calculated_rating,
+# 	   SUM(post_rating) + SUM(post_comments_rating) + 
+# 	   (SELECT SUM(rating) FROM news_comment c where c.user_id = q.id) as SQL_calculated_rating
+#   FROM q
+#   GROUP BY id, username, rating
+
+|username     |python_calculated_rating|SQL_calculated_rating|
+|-------------|------------------------|---------------------|
+|MusicReviewer|-4                      |-4                   |
+|FilmReviewer | 8                      | 8                   |
+

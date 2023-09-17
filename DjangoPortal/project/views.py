@@ -26,4 +26,3 @@ class CounterpartiesTable(TemplateView):
         # cp.exec_command(cn, "INSERT INTO COUNTERPARTIES values(1, 'AbsolutBank', '01.01.2023', null)")
         cn.rollback()
         return ctx
-

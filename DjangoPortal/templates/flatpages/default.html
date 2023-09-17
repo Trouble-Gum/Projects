@@ -11,46 +11,50 @@
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
     </head>
     <body>
-        <!-- Responsive navbar-->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
-            <div class="container">
-                <a class="navbar-brand" href="#">Django portal</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse"
-                        data-target="#navbarResponsive"
-                        aria-controls="navbarResponsive" aria-expanded="false"
-                        aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ml-auto">
-                        <!--<li class="nav-item active">
-                            <a class="nav-link" href="/home/">Home
-                                <span class="sr-only">(current)</span>
-                            </a>
-                        </li>-->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/about/">About</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/contacts/">Contact</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/counterparties/">Counterparties</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/news/">News</a>
-                        </li>
-                        <li>
-                            {% if request.user.username %}
-                                <a class="nav-link" href="/accounts/logout">sign out ({{request.user.username}})</a>
-                            {% else %}
-                                <a class="nav-link" href="/accounts/login">sign in</a>
-                            {% endif %}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        {% load cache %}
+            {% cache 30 navbar %}
+                <!-- Responsive navbar-->
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+                    <div class="container">
+                        <a class="navbar-brand" href="#">Django portal</a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                                data-target="#navbarResponsive"
+                                aria-controls="navbarResponsive" aria-expanded="false"
+                                aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarResponsive">
+                            <ul class="navbar-nav ml-auto">
+                                <!--<li class="nav-item active">
+                                    <a class="nav-link" href="/home/">Home
+                                        <span class="sr-only">(current)</span>
+                                    </a>
+                                </li>-->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/about/">About</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/contacts/">Contact</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/counterparties/">Counterparties</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/news/">News</a>
+                                </li>
+                                <li>
+                                    {% if request.user.username %}
+                                        <a class="nav-link" href="/accounts/logout">sign out ({{request.user.username}})</a>
+                                    {% else %}
+                                        <a class="nav-link" href="/accounts/login">sign in</a>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            {% endcache %}
+
         <!-- Page content-->
         <div class="container">
             <div class="row">

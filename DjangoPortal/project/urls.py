@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+import apps.news.urls
 from project import views
 from apps.news import views as news_views
 
@@ -29,13 +30,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 
     path('counterparties/', views.CounterpartiesTable.as_view()),
-    path('news/', news_views.NewsList.as_view(), name='news_list'),
-    path('news/<int:pk>', news_views.NewsDetail.as_view(), name='new_detail'),
-    path('', news_views.NewsList.as_view()),  # default start with news page
-    path('news/create/', news_views.NewCreate.as_view(), name='new_create'),
-    path('news/<int:pk>/update', news_views.NewUpdate.as_view(), name='new_update'),
-    path('news/<int:pk>/delete', news_views.NewDelete.as_view(), name='new_delete'),
-    path('articles/create/', news_views.ArticleCreate.as_view(), name='article_create'),
-    path('articles/<int:pk>/update', news_views.ArticleUpdate.as_view(), name='article_update'),
-    path('articles/<int:pk>/delete', news_views.ArticleDelete.as_view(), name='article_delete'),
 ]
+urlpatterns = urlpatterns + apps.news.urls.urlpatterns
