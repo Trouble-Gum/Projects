@@ -30,5 +30,6 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 
     path('counterparties/', views.CounterpartiesTable.as_view()),
+    path('martor/', include('martor.urls')),
 ]
 urlpatterns = urlpatterns + apps.adverts.urls.urlpatterns

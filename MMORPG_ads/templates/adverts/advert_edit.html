@@ -1,0 +1,30 @@
+{% extends 'flatpages/default.html' %}
+
+{% block css %}
+  <link href="../project/static/plugins/css/ace.min.css" type="text/css" media="all" rel="stylesheet" />
+  <link href="../project/static/plugins/css/resizable.min.css" type="text/css" media="all" rel="stylesheet" />
+  <link href="../project/static/martor/css/martor.bootstrap.min.css" type="text/css" media="all" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<h1>{{ post_type }}</h1>
+<hr>
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save" />
+</form>
+{% endblock content %}
+
+{% block js %}
+  <script type="text/javascript" src="../project/static/plugins/js/ace.js"></script>
+  <script type="text/javascript" src="../project/static/plugins/js/mode-markdown.js"></script>
+  <script type="text/javascript" src="../project/static/plugins/js/ext-language_tools.js"></script>
+  <script type="text/javascript" src="../project/static/plugins/js/theme-github.js"></script>
+  <script type="text/javascript" src="../project/static/plugins/js/typo.js"></script>
+  <script type="text/javascript" src="../project/static/plugins/js/spellcheck.js"></script>
+  <script type="text/javascript" src="../project/static/plugins/js/highlight.min.js"></script>
+  <script type="text/javascript" src="../project/static/plugins/js/resizable.min.js"></script>
+  <script type="text/javascript" src="../project/static/plugins/js/emojis.min.js"></script>
+  <script type="text/javascript" src="../project/static/martor/js/martor.bootstrap.min.js"></script>
+{% endblock %}

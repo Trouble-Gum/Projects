@@ -4,24 +4,22 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import redirect, render
+
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
 
-from apps.adverts.models import Post, article, new, CategorySubscribers, Category
+from apps.adverts.models import Post
 from apps.adverts.filters import PostFilter
-from apps.adverts.forms import NewForm, NewArticle
-from .tasks import complete_order
+from apps.adverts.forms import NewForm
+
+from apps.adverts.middleware import get_current_user
 
 
-class NewsList(ListView):
+class AdvertsList(ListView):
     model = Post
     ordering = '-posted_at'
-    template_name = 'adverts/advert.html'
+    template_name = 'adverts/adverts.html'
     context_object_name = 'adverts'
     paginate_by = 10
 
@@ -68,22 +66,11 @@ class NewsList(ListView):
 
         return super().get(self, request, *args, **kwargs)
 
-    # def post(self, request: WSGIRequest, *args, **kwargs):
-    #     post = dict(request.POST)
-    #     # context = super().get_context_data(**kwargs)
-    #     if post['subscribe'] == ['subscribe']:
-    #         print('RQ - ' + str(request.GET))
-    #         # for rec in self.category_filter_values:
-    #         #     print(rec)
-    #         # cs = CategorySubscribers(subscriber=request.user, category=Category.objects.get(category_name='Cars'))
-    #         # cs.save()
-    #     return redirect('/')
 
-
-class NewsDetail(DetailView):
+class AdvertDetail(DetailView):
     model = Post
     template_name = 'adverts/advert.html'
-    context_object_name = 'new'
+    context_object_name = 'advert'
 
     def get_object(self, *args, **kwargs):
         obj = cache.get(f'post-{self.kwargs["pk"]}', None)
@@ -102,75 +89,37 @@ def get_context_data_(self, **kwargs):
     return context
 
 
-class NewCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class AdvertCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = NewForm
     model = Post
-    template_name = 'adverts/new_edit.html'
-    post_type = 'New'
+    template_name = 'adverts/advert_edit.html'
+    post_type = 'Advert'
     get_context_data = get_context_data_
-
+    usr = get_current_user()
     permission_required = ('adverts.add_post',)
 
     def form_valid(self, form):
         # print(form)
         post = form.save(commit=False)
-        post.post_type = new
-        complete_order.apply_async([post.pk], countdown=10)
+        # complete_order.apply_async([post.pk], countdown=10)
         return super().form_valid(form)
 
 
-
-class NewUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class AdvertUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = NewForm
     model = Post
-    template_name = 'adverts/new_edit.html'
-    post_type = 'New'
+    template_name = 'adverts/advert_edit.html'
+    post_type = 'Advert'
     get_context_data = get_context_data_
 
     permission_required = ('adverts.change_post',)
 
 
-class NewDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class AdvertDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Post
-    template_name = 'adverts/new_delete.html'
-    success_url = reverse_lazy('news_list')
-    post_type = 'New'
-    get_context_data = get_context_data_
-
-    permission_required = ('adverts.delete_post',)
-
-
-
-class ArticleCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    form_class = NewArticle
-    model = Post
-    template_name = 'adverts/new_edit.html'
-    post_type = 'Article'
-    get_context_data = get_context_data_
-
-    permission_required = ('adverts.add_post',)
-
-    def form_valid(self, form):
-        post = form.save(commit=False)
-        post.post_type = article
-        return super().form_valid(form)
-
-
-class ArticleUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    form_class = NewArticle
-    model = Post
-    template_name = 'adverts/new_edit.html'
-    post_type = 'Article'
-    get_context_data = get_context_data_
-
-    permission_required = ('adverts.change_post',)
-
-
-class ArticleDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = Post
-    template_name = 'adverts/new_delete.html'
-    success_url = reverse_lazy('news_list')
-    post_type = 'Article'
+    template_name = 'adverts/advert_delete.html'
+    success_url = reverse_lazy('adverts_list')
+    post_type = 'Advert'
     get_context_data = get_context_data_
 
     permission_required = ('adverts.delete_post',)

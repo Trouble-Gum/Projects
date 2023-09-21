@@ -1,15 +1,15 @@
 {% extends 'flatpages/default.html' %}
-{% load custom_tags %}
 {% load static %}
+{% load martortags %}
 {% block title %}
-News
+adverts
 {% endblock title %}
-
+<img src="../static/media/adverts/create.jpg" width="20">
 {% block content %}
-   <h1>All the news ({{news|length}})</h1>
+   <h1>All the adverts ({{adverts|length}})</h1>
        <p>
            <img src="../static/media/adverts/create.jpg" width="20">
-           <a href="/adverts/create">Create new</a> |
+           <a href="/adverts/create">Create advert</a> |
            <a href="/articles/create">Create article</a>
        </p>
    {# Add form with fields to handle (applying filter) #}
@@ -46,55 +46,13 @@ News
                </td>
            </tr>
        </table>
-       <p>
-           {# Add submit button #}
-           <input type="submit" value="Find" />
-           {% if category_filter_values %}
-               <button value="subscribe" name="subscribe"
-                       id = "subscribe" title="subscribe on selected categories">subscribe
-               </button>
-           {% endif %}
-       </p>
+
    </form>
 
-<script type="text/javascript">
-    let filterForm = document.getElementById("filterForm");
-
-    document.getElementById('subscribe').onclick = function() {
-        //let currentURL = new URL(window.location.href);
-        //currentURL.searchParams.append('subscribe', 'subscribe');
-        //currentURL.searchParams.delete('category');
-        var selected = [];
-        for (var option of document.getElementById('id_category').options)
-        {
-            if (option.selected) {
-                selected.push(option.value);
-                //currentURL.searchParams.append('category', option.value);
-            }
-        }
-
-        res = confirm("The following categories will be subscribed: " + selected);
-        if (res) {
-            //alert(currentURL)
-            //window.location.href = currentURL;
-            filterForm.submit();
-        }
-        else {
-            return false
-        }
-    }
-/*
-    filterForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-         perform operation with form input
-        filterForm.submit();
-    });
-*/
-</script>
 
    <hr>
 
-    {% if news %}
+    {% if adverts %}
         <style>
           p {
             color: red;
@@ -118,26 +76,29 @@ News
                <td>Preview</td>
            </tr>
 
-           {% for new in news %}
+           {% for advert in adverts %}
            <tr>
-               <td width = "40%" align="justify">{{ new.caption }}</td>
-               <td width = "20%" class="paragraph2">&nbsp;&nbsp;{{ new.posted_at|date:'d M Y' }}</td>
+               <td width = "40%" align="justify">{{ advert.caption }}</td>
+               <td width = "20%" class="paragraph2">&nbsp;&nbsp;{{ advert.posted_at|date:'d M Y' }}</td>
                <td align="justify">
-                   <a href="/news/{{new.id}}">&nbsp;&nbsp;{{ new.text|truncatewords:20 }}</a>
+                   <a href="/adverts/{{advert.id}}">&nbsp;&nbsp;{{ advert.text|truncatewords:20 }}</a>
                </td>
-               {% if new.post_type == "NE" %}
+               <td align="justify">
+                   {{ advert.description|safe_markdown }}
+               </td>
+               {% if advert.post_type == "AD" %}
                    <td align="justify">
-                       <a href="/news/{{new.id}}/update"> <img src="../static/media/update.jpg" width="20"> </a>
+                       <a href="/adverts/{{advert.id}}/update"> <img src="../static/media/update.jpg" width="20"> </a>
                    </td>
                    <td align="justify">
-                       <a href="/news/{{new.id}}/delete"> <img src="../static/media/delete.jpg" width="20"> </a>
+                       <a href="/adverts/{{advert.id}}/delete"> <img src="../static/media/delete.jpg" width="20"> </a>
                    </td>
-               {% elif new.post_type == "AR" %}
+               {% elif advert.post_type == "AR" %}
                     <td align="justify">
-                       <a href="/articles/{{new.id}}/update"> <img src="../static/media/update.jpg" width="20"> </a>
+                       <a href="/articles/{{advert.id}}/update"> <img src="../static/media/update.jpg" width="20"> </a>
                    </td>
                    <td align="justify">
-                       <a href="/articles/{{new.id}}/delete"> <img src="../static/media/delete.jpg" width="20"> </a>
+                       <a href="/articles/{{advert.id}}/delete"> <img src="../static/media/delete.jpg" width="20"> </a>
                    </td>
                {% endif %}
            </tr>
@@ -148,30 +109,8 @@ News
 
        </table>
    {% else %}
-       <h2>There are no news and articles!</h2>
+       <h2>There are no adverts and articles!</h2>
    {% endif %}
 
-{# Add pagination to the page #}
-
-   {# Previous pages info #}
-   {% if page_obj.has_previous %}
-       <a href="?{% url_replace page=1 %}">1</a>
-       {% if page_obj.previous_page_number != 1 %}
-           ...
-           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
-       {% endif %}
-   {% endif %}
-
-   {# Current page info #}
-   {{ page_obj.number }}
-
-   {# Following pages info #}
-   {% if page_obj.has_next %}
-       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
-       {% if paginator.num_pages != page_obj.next_page_number %}
-           ...
-           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
-       {% endif %}
-   {% endif %}
 
 {% endblock content %}

@@ -5,7 +5,13 @@ from django.core.exceptions import *
 from django.urls import reverse
 from django.core.cache import cache
 
+from django.db import models
+from martor.models import MartorField
+
+from apps.adverts.middleware import get_current_user
+
 # Create your models here.
+
 
 class Author(models.Model):
     """Django model which implements Author entity"""
@@ -13,23 +19,6 @@ class Author(models.Model):
     rating = models.FloatField(default=0)
     name: str
     objects = Manager()
-
-    def update_rating(self):
-        """
-        Reckons authors rating based on posts/comments and puts total sum into DB
-        """
-        total_rating = 0
-        for rec in Post.objects.filter(author=self):
-            total_rating += rec.rating * 3
-            # print(rec.rating)
-            for com in Comment.objects.filter(post=rec):
-                total_rating += com.rating
-                # print('   ', com.rating)
-        for com in Comment.objects.filter(user=self.user):
-            total_rating += com.rating
-            # print(' ', com.rating)
-        self.rating = total_rating
-        self.save()
 
     @staticmethod
     def create_author(username, password, user_id=None):
@@ -95,46 +84,42 @@ class Author(models.Model):
         return result if result.strip() else self.get_username()
 
 
-class Category(models.Model):
-    """Django model which implements Category entity"""
-    objects = Manager()
-    category_name = models.CharField(max_length=20, unique=True)
-    subscribers = models.ManyToManyField(User, through='CategorySubscribers')
+tnk = 'tnk'
+hl = 'hl'
+dd = 'dd'
+trd = 'trd'
+gm = 'gm'
+qst = 'qst'
+bsm = 'bsm'
+skn = 'skn'
+zlv = 'zlv'
+mst = 'mst'
 
-    def __str__(self):
-        return self.category_name
-
-
-article = 'AR'
-new = 'NE'
-
-POST_TYPES = [
-    (article, 'Article'),
-    (new, 'New')
+POST_CATEGORIES = [
+    (tnk, 'Танки'),
+    (hl, 'Хилы'),
+    (dd, 'ДД'),
+    (trd, 'Торговцы'),
+    (gm, 'Гилдмастеры'),
+    (qst, 'Квестгиверы'),
+    (bsm, 'Кузнецы'),
+    (skn, 'Кожевники'),
+    (zlv, 'Зельевары'),
+    (mst, 'Мастера заклинаний')
 ]
 
 
 class Post(models.Model):
     """Django model which implements Post entity"""
-    author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
-    post_type = models.CharField(max_length=2, choices=POST_TYPES, default=new)
+    author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True, default=get_current_user())
+    post_type = models.CharField(max_length=30, choices=POST_CATEGORIES, default=tnk)
     posted_at = models.DateTimeField(auto_now_add=True)
-    categories = models.ManyToManyField(Category, through='PostCategory')
+
     caption = models.CharField(max_length=100)
-    text = models.CharField(max_length=10000)
-    rating = models.FloatField(default=0)
+
+    description = MartorField(default='Type your text here')
 
     objects = Manager()
-
-    def like(self, username=''):  # storing information about likes-history are supposed in future
-        """increases amount of posts likes"""
-        self.rating += 1
-        self.save()
-
-    def dislike(self, username=''):  # storing information about dislikes-history are supposed in future
-        """decreases amount of post likes"""
-        self.rating -= 1
-        self.save()
 
     def preview(self):
         """returns first 124 letters of post text"""
@@ -148,42 +133,20 @@ class Post(models.Model):
         return self.author.get_username()
 
     def get_absolute_url(self):
-        return reverse('new_detail', args=[str(self.pk)])
+        return reverse('advert_detail', args=[str(self.pk)])
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         cache.delete(f'post-{self.pk}')
 
 
-class PostCategory(models.Model):
-    """Django model which implements many-to-many relationship between entities (Post&Category)"""
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    objects = Manager()
-
-
-class CategorySubscribers(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    subscriber = models.ForeignKey(User, on_delete=models.CASCADE)
-    models.UniqueConstraint(fields=['category_id', 'subscriber_id'], name='UK_CategorySubscribers', )
-
-    objects = Manager()
-
-class Comment(models.Model):
+class Reply(models.Model):
     """Django model which implements Comment entity"""
     objects = Manager()
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     text = models.CharField(max_length=1000)
     commented_at = models.DateTimeField(auto_now_add=True)
-    rating = models.FloatField(default=0)
 
-    def like(self, username=''):  # storing information about likes-history are supposed in future
-        """increases amount of comment likes"""
-        self.rating += 1
-        self.save()
 
-    def dislike(self, username=''):  # storing information about dislikes-history are supposed in future
-        """decreases amount of post likes"""
-        self.rating -= 1
-        self.save()
+

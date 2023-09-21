@@ -1,12 +1,12 @@
 {% extends 'flatpages/default.html' %}
 {% load custom_filters %}
 {% block title %}
-New
+advert
 {% endblock title %}
 
 
 {% block content %}
-<h1>{{ new.caption }}</h1>
-<h5>by {{ new.author_name }} at {{ new.posted_at|date:'d M Y' }}</h5>
-<table><tr><td align="justify">&nbsp;&nbsp;&nbsp;&nbsp;{{new.text|censoring_filter}}</td></tr></table>
+<h1>{{ advert.caption }}</h1>
+<h5>by {{ advert.author_name }} at {{ advert.posted_at|date:'d M Y' }}</h5>
+<table><tr><td align="justify">&nbsp;&nbsp;&nbsp;&nbsp;{{advert.text|censoring_filter}}</td></tr></table>
 {% endblock content %}
