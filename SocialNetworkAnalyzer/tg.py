@@ -23,6 +23,7 @@ class TGAnalyser:
 
         self._client.start()
 
+
     def get_stat_by_period(self, start_date, end_date):
         f""" function invokes GetHistoryRequest, GetMessagePublicForwardsRequest using TG API and telethon 
         :param start_date: start date of a period to be analyzed 
@@ -33,7 +34,7 @@ class TGAnalyser:
         """
 
         history = self._client(GetHistoryRequest(
-            peer=cf.TG_CHANNEL_ID,
+            peer=cf.TG_CHANNEL_NAME,
             offset_id=0,
             offset_date=None,
             add_offset=0,
@@ -42,6 +43,7 @@ class TGAnalyser:
             min_id=0,
             hash=0
         ))
+
 
         tg_list = []
 

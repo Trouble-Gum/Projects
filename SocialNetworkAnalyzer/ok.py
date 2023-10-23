@@ -82,7 +82,6 @@ class OKAnalyser:
         stat = stat[-1::-1]
 
         for stat_rec in stat:
-
             if not cf.LAST_MON <= stat_rec[CREATED_MS] < cf.CUR_MON:
                 continue
 
@@ -100,4 +99,5 @@ class OKAnalyser:
                 stat_rec[CREATED_MS].strftime("%d.%m.%Y"), text, cf.OK_TOPIC_URL_PATTERN + tpc_id,
                 stat_rec[LIKES], stat_rec[COMMENTS], stat_rec[REPOSTS], stat_rec[VIEWS]
             ])
+
         return ok_list
