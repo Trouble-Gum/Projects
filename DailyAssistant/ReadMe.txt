@@ -1,6 +1,7 @@
 # Daily assistant  - is the telegram bot which can help you 
 # translate texts between languages and make currency conversion.
 
+
 # All functionality of this bot is described in config.py and also used 
 # as a responce of /start command
 
